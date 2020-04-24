@@ -3,6 +3,7 @@ class Strategy:
 		self.instance = instance
 		self.parse_instance()
 		self.attempts = 0
+		self.name = 'Strategy Name'
 
 	def parse_instance(self):
 		self.depo_coords, self.specs, self.customer_info = self.instance

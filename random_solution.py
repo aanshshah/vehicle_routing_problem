@@ -3,13 +3,21 @@ from utils import calculate_distance
 from strategy import Strategy
 
 class RandomStrategy(Strategy):
-	def __init__(self, instance):
+	def __init__(self, instance, greedy=False, seed=0):
 		super().__init__(instance)
+		random.seed(seed)
+		self.greedy = greedy
+		self.name = "Random"
+		if self.greedy:
+			self.name = "GreedyRandom"
 
 	def approach(self):
 		def random_search():
 			truck_x, truck_y = self.depo_coords
-			random.shuffle(self.customer_info)
+			if self.greedy:
+				self.customer_info.sort(key=lambda x: x[1])
+			else:
+				random.shuffle(self.customer_info)
 			visited = set()
 			total_distance_traveled = 0
 			all_truck_paths = []
