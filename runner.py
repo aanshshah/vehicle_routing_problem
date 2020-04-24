@@ -1,17 +1,18 @@
 import argparse
 from random_solution import RandomStrategy
+import os
 
 def read_instance(filename):
 		with open(filename, 'r') as f:
 			lines = f.readlines()
 		num_customers, num_vehicles, vehicle_capacity = [int(x) for x in lines[0].split()]
-		_, depo_x, depo_y = [int(x) for x in lines[1].split()]
+		_, depo_x, depo_y = [float(x) for x in lines[1].split()]
 		customer_info = []
 		idx = 1
 		for line in lines[2:]:
 			line = line.split()
 			if line:
-				customer = [idx] + [int(x) for x in line]
+				customer = [idx] + [float(x) for x in line]
 				idx += 1
 				if customer:
 					customer_info.append(customer) # idx, customer_demand, customer_x, customer_y
@@ -30,15 +31,24 @@ def format_path(paths, save_solution=False):
 			formatted_path += '\n'
 	return formatted_path
 
-def main(instance):
-	instance = read_instance(instance)
+def run_all():
+	test_files = os.listdir('input')
+	for file in test_files:
+		file_path = os.path.join('input', file)
+		run_single(file_path)
+
+def run_single(file):
+	instance = read_instance(file)
 	random_strategy = RandomStrategy(instance)
 	paths, distance = random_strategy.run()
 	print(format_path(paths))
-	
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
-	parser.add_argument('filename')
+	parser.add_argument('filename', nargs='?')
+	parser.add_argument('-s', '--single', action='store_true')
 	args = parser.parse_args()
-	main(args.filename)
+	if args.single and args.filename:
+		run_single(args.filename)
+	else:
+		run_all()
