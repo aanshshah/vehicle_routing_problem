@@ -48,8 +48,11 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('filename', nargs='?')
 	parser.add_argument('-s', '--single', action='store_true')
+	# parser.add_argument('-a', '--algorithm', default='random')
 	args = parser.parse_args()
 	if args.single and args.filename:
 		run_single(args.filename)
+		# run_single(args.filename, args.algorithm)
 	else:
 		run_all()
+		# run_all(args.algorithm)
