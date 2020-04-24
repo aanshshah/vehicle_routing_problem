@@ -1,19 +1,12 @@
 import random 
 from utils import calculate_distance
+from strategy import Strategy
 
-class RandomStrategy:
+class RandomStrategy(Strategy):
 	def __init__(self, instance):
-		self.instance = instance
-		self.parse_instance()
-		self.attempts = 0
+		super().__init__(instance)
 
-	def parse_instance(self):
-		self.depo_coords, self.specs, self.customer_info = self.instance
-		self.num_customers = self.specs[0]
-		self.num_vehicles = self.specs[1]
-		self.vehicle_capacity = self.specs[2]
-
-	def random_approach(self):
+	def approach(self):
 		def random_search():
 			truck_x, truck_y = self.depo_coords
 			random.shuffle(self.customer_info)
@@ -50,5 +43,5 @@ class RandomStrategy:
 				return all_truck_paths, total_distance_traveled
 
 	def run(self):
-		self.paths, self.distance = self.random_approach()
+		self.paths, self.distance = self.approach()
 		return self.paths, self.distance
