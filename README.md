@@ -12,3 +12,11 @@ So far the following strategies are available:
 To test different seeds: python runner.py -a <strategy> -t
 - random: best seed is 0 when tested from 0 to 10,000 across all the test files
 - random_greedy: did not finish testing in 5 minutes; needs to run for longer to find out
+
+TODO:
+- Add an epsilon based searching strategy to relax search criteria for hill climbing 
+	- Try distance (ascending and descending)
+	- Try different strategies for branching on vehicle capacity 
+- BEAM search
+- Simulated Annealing
+- TABU search

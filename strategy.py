@@ -15,5 +15,9 @@ class Strategy:
 		pass
 
 	def run(self):
-		self.paths, self.distance = self.approach()
+		solution = self.approach()
+		if solution:
+			self.paths, self.distance = solution
+		else:
+			self.paths, self.distance = None, None
 		return self.paths, self.distance

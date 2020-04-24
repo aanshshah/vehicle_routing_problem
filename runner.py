@@ -1,5 +1,6 @@
 import argparse
 from random_solution import RandomStrategy
+from greedy_hill_climbing import GreedyHillClimbing
 import os
 
 def read_instance(filename):
@@ -45,10 +46,12 @@ def run_single(file, strategy, print_out=True):
 	instance = read_instance(file)
 	strategy = get_strategy(strategy, instance)
 	paths, distance = strategy.run()
-	if print_out:
+	if paths and distance and print_out:
 		print('Strategy: '+strategy.name)
 		print(format_path(paths))
 		print("distance: {0}".format(str(distance)))
+	else:
+		print("NO SOLUTION FOUND FOR {0}".format(file))
 
 
 #find best seed across all files
@@ -74,6 +77,8 @@ def get_strategy(strategy, instance, seed=0):
 		return RandomStrategy(instance, seed=seed)
 	if strategy == 'random_greedy':
 		return RandomStrategy(instance, greedy=True, seed=seed)
+	if strategy == 'greedy_hill':
+		return GreedyHillClimbing(instance)
 
 def main(filename, single, strategy, test):
 	if test and strategy:
@@ -89,7 +94,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('filename', nargs='?')
 	parser.add_argument('-s', '--single', action='store_true')
-	parser.add_argument('-a', '--strategy', default='random', choices=['random', 'random_greedy'])
+	parser.add_argument('-a', '--strategy', default='random', choices=['random', 'random_greedy', 'greedy_hill'])
 	parser.add_argument('-t', '--test', action='store_true')
 	args = parser.parse_args()
 	main(**vars(args))
