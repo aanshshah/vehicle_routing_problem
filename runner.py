@@ -42,6 +42,7 @@ def run_single(file):
 	random_strategy = RandomStrategy(instance)
 	paths, distance = random_strategy.run()
 	print(format_path(paths))
+	print("distance: {0}".format(str(distance)))
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
