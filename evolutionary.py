@@ -2,17 +2,19 @@ import random
 from utils import calculate_distance
 from strategy import Strategy
 import numpy as np
+import copy
 
-class Iterative_Solution(Strategy):
+class Evolution_Solution(Strategy):
 	def __init__(self, instance, greedy=False, seed=0, epsilon=1):
 		super().__init__(instance)
 		random.seed(seed)
 		self.greedy = greedy
-		self.name = "iterative_sol"
+		self.name = "iterative_sol_evo"
 		self.vehicle_map = {i : (self.vehicle_capacity, 0, [0]) for i in range(self.num_vehicles)}
 		self.epsilon = epsilon
 
 	def get_initial_solution(self):
+		# random.seed(seed)
 		def random_search():
 			if self.greedy:
 				self.customer_info.sort(key=lambda x: x[1])
@@ -26,7 +28,6 @@ class Iterative_Solution(Strategy):
 				truck_path = [0]
 				for customer_idx, customer_demand, _, _ in self.customer_info:
 					if customer_idx == 0: continue
-
 					if customer_idx in visited:
 						continue		
 					if capacity - customer_demand < 0:
@@ -49,12 +50,115 @@ class Iterative_Solution(Strategy):
 			if len(visited) == self.num_customers:
 				return all_truck_paths
 
-	def approach(self):
-		all_truck_paths = self.get_initial_solution()
-		all_truck_paths, total_distance_traveled =  self.iterate_on_solution(all_truck_paths,iterations=1000,selector=greedy)
+	def approach(self,pop_size=100,top_k=10):
+		population = [self.get_initial_solution() for i in range(pop_size)]
+
+		for step in range(1000):
+			print(step)
+			population = self.evolve(population,top_k)
+
+
+
+
+		# all_truck_paths, total_distance_traveled =  self.iterate_on_solution(all_truck_paths,iterations=1000,selector=greedy) # Could try doing this periodically
 		# all_truck_paths, total_distance_traveled = self.iterate_on_solution(all_truck_paths,iterations=10000,selector=simmulated_annealing)
 
 		return all_truck_paths, total_distance_traveled 
+
+	def evolve(self,population,top_k=10,p=0.30):
+		fitness = [(s,self.calculate_total_distance(s)) for s in population]
+		ranked_pop = sorted(fitness,key=lambda x: x[-1])[:top_k]
+		print("Best",ranked_pop[0][1])
+
+		new_pop = []
+		for i in range(top_k):
+			for j in range(top_k):
+				if i != j:
+					candidate = self.recombine(ranked_pop[i][0],ranked_pop[j][0])
+				else:
+					candidate = ranked_pop[i][0]
+				candidate = self.mutate(candidate,p)
+				new_pop.append(candidate)
+
+		return new_pop
+
+	def mutate(self,solution,p):
+		if np.random.rand() < p:
+			swaps = self.get_all_neighbors(solution)  #Can't do multiple mutations simultaneosly?
+			random.shuffle(swaps)
+			choice = swaps[0]
+			solution, _ = self.apply_swap(solution,choice)
+		return solution
+
+
+	def recombine(self,solution_1,solution_2): #Should i use numpy arrays??? (This applies to the swap approach too)
+		# segment_length = 
+
+	
+
+
+
+		truck_selected = np.random.randint(0,len(solution_1))
+
+
+		# print(solution_1[truck_selected])
+
+
+		if len(solution_1[truck_selected]) <= 2:
+			return copy.deepcopy(solution_2)
+
+
+		if len(solution_1[truck_selected]) == 3:
+			start = 1
+			end = 2
+		else:
+			start = np.random.randint(1,len(solution_1[truck_selected])-1)
+			end = np.random.randint(start+1,len(solution_1[truck_selected]))
+
+		# print(start,end)
+
+
+		segment = solution_1[truck_selected][start:end]
+
+		# print(segment)
+
+
+		# print(segment)
+		solution_2 = copy.deepcopy(solution_2)
+
+		for t in range(len(solution_2)):  #Can make this faster
+			for c in segment:
+				if c in solution_2[t]: 
+					solution_2[t].remove(c)
+
+
+
+		truck_added = np.random.randint(0,len(solution_2))
+
+		# print(len(solution_2[truck_added]))
+		if len(solution_2[truck_added]) == 2:
+			insertion_location = 1
+		else:
+			insertion_location = np.random.randint(1,len(solution_2[truck_added])-1)
+		# print(solution_2[truck_added] )
+		# print(insertion_location)
+
+
+		solution_2[truck_added] = solution_2[truck_added][:insertion_location]+segment + solution_2[truck_added][insertion_location:]
+		# print(solution_2[truck_added])
+
+
+		all_ele = []
+		for t in solution_2:
+			all_ele+=t
+
+		# print("LEN:",len(set(all_ele)))
+		# if len(set(all_ele)) < 101: exit()
+		# exit()
+		# exit()
+		# exit()
+		return solution_2
+
 
 	def calculate_total_distance(self,solution):
 		total_distance_traveled = 0

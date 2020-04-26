@@ -2,6 +2,7 @@ import argparse
 from random_solution import RandomStrategy
 from greedy_hill_climbing import GreedyHillClimbing
 from zach_test import Iterative_Solution
+from evolutionary import Evolution_Solution
 import os
 
 
@@ -81,9 +82,10 @@ def get_strategy(strategy, instance, seed=0):
 		return RandomStrategy(instance, greedy=True, seed=seed)
 	if strategy == 'greedy_hill':
 		return GreedyHillClimbing(instance)
-	else:
+	elif strategy == 'hill':
 		return Iterative_Solution(instance)
-
+	else:
+		return Evolution_Solution(instance)
 
 
 
