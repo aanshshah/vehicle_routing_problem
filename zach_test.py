@@ -7,24 +7,25 @@ class Iterative_Solution(Strategy):
 	def __init__(self, instance, greedy=False, seed=0, epsilon=1):
 		super().__init__(instance)
 		random.seed(seed)
-		self.greedy = greedy
+		self.greedy =False # greedy
 		self.name = "iterative_sol"
 		self.vehicle_map = {i : (self.vehicle_capacity, 0, [0]) for i in range(self.num_vehicles)}
 		self.epsilon = epsilon
 
 	def get_initial_solution(self):
 		def random_search():
+			ordering = self.customer_info.copy()
 			if self.greedy:
 				self.customer_info.sort(key=lambda x: x[1])
 			else:
-				random.shuffle(self.customer_info)
+				random.shuffle(ordering)
 			visited = set()
 			total_distance_traveled = 0
 			all_truck_paths = []
 			for i in range(self.num_vehicles): 
 				capacity = self.vehicle_capacity 
 				truck_path = [0]
-				for customer_idx, customer_demand, _, _ in self.customer_info:
+				for customer_idx, customer_demand, _, _ in ordering:
 					if customer_idx == 0: continue
 
 					if customer_idx in visited:
@@ -51,7 +52,7 @@ class Iterative_Solution(Strategy):
 
 	def approach(self):
 		all_truck_paths = self.get_initial_solution()
-		all_truck_paths, total_distance_traveled =  self.iterate_on_solution(all_truck_paths,iterations=1000,selector=greedy)
+		all_truck_paths, total_distance_traveled =  self.iterate_on_solution(all_truck_paths,iterations=1000,selector=simmulated_annealing)
 		# all_truck_paths, total_distance_traveled = self.iterate_on_solution(all_truck_paths,iterations=10000,selector=simmulated_annealing)
 
 		return all_truck_paths, total_distance_traveled 
@@ -120,11 +121,23 @@ class Iterative_Solution(Strategy):
 		assert truck_paths == solution
 		return evaluated_swaps
 
-	def iterate_on_solution(self,truck_paths,selector,iterations=1000,stop_if_no_progress=False):
+	def check_within_capacity(self,solution):
+		# print(self.customer_info)
+
+		for truck in solution:
+			total_truck_demand = sum([self.customer_info[c][1] for c in truck[1:-1]])
+			if total_truck_demand > self.vehicle_capacity:
+				return False
+		
+		return True
+
+	def iterate_on_solution(self,truck_paths,selector,iterations=2000,stop_if_no_progress=False):
 			#For every vehicle, for every customer, for every location
 
 			solution = truck_paths
 			objective_value = self.calculate_total_distance(solution)
+			# print(self.check_within_capacity(solution))
+			# exit()
 			print("initial:",objective_value)
 			for step in range(iterations):
 				previous_value = objective_value
@@ -139,6 +152,8 @@ class Iterative_Solution(Strategy):
 					if previous_value == objective_value: break;
 
 			return solution,objective_value
+
+
 
 def greedy(swaps,previous_value=None,step=None,max_step=None):
 		greedy_best = min(swaps,key=lambda x:x[-1])
@@ -158,6 +173,9 @@ def simmulated_annealing(swaps,previous_value,step,max_step):
 		if accept_P >= np.random.rand():
 			return sample
 		else: return None
+
+
+# def two_opt(current_solution):
 
 
 

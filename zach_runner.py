@@ -4,6 +4,7 @@ from greedy_hill_climbing import GreedyHillClimbing
 from zach_test import Iterative_Solution
 from evolutionary import Evolution_Solution
 import os
+from twoopt import TwoOpt_Solution
 
 
 def read_instance(filename):
@@ -20,7 +21,8 @@ def read_instance(filename):
 				idx += 1
 				if customer:
 					customer_info.append(customer) # idx, customer_demand, customer_x, customer_y
-		return [depo_x, depo_y], [num_customers, num_vehicles, vehicle_capacity], customer_info
+		# print(customer_info)
+		return [depo_x, depo_y], [num_customers, num_vehicles, vehicle_capacity], sorted(customer_info,key=lambda x: x[0])
 
 
 def format_path(paths, save_solution=False):
@@ -84,6 +86,8 @@ def get_strategy(strategy, instance, seed=0):
 		return GreedyHillClimbing(instance)
 	elif strategy == 'hill':
 		return Iterative_Solution(instance)
+	elif strategy == '2opt':
+		return TwoOpt_Solution(instance)
 	else:
 		return Evolution_Solution(instance)
 
