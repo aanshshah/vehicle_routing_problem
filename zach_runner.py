@@ -4,7 +4,9 @@ from greedy_hill_climbing import GreedyHillClimbing
 from zach_test import Iterative_Solution
 from evolutionary import Evolution_Solution
 import os
+from combine_approaches import Combined_Evo_TwoOpt
 from twoopt import TwoOpt_Solution
+
 
 
 def read_instance(filename):
@@ -88,8 +90,12 @@ def get_strategy(strategy, instance, seed=0):
 		return Iterative_Solution(instance)
 	elif strategy == '2opt':
 		return TwoOpt_Solution(instance)
-	else:
+	elif strategy == 'evo':
 		return Evolution_Solution(instance)
+	else:
+		return Combined_Evo_TwoOpt(instance)
+
+		
 
 
 

@@ -52,7 +52,7 @@ class Iterative_Solution(Strategy):
 
 	def approach(self):
 		all_truck_paths = self.get_initial_solution()
-		all_truck_paths, total_distance_traveled =  self.iterate_on_solution(all_truck_paths,iterations=1000,selector=simmulated_annealing)
+		all_truck_paths, total_distance_traveled =  self.iterate_on_solution(all_truck_paths,iterations=1000,selector=greedy)
 		# all_truck_paths, total_distance_traveled = self.iterate_on_solution(all_truck_paths,iterations=10000,selector=simmulated_annealing)
 
 		return all_truck_paths, total_distance_traveled 
