@@ -100,10 +100,11 @@ class TwoOpt_Solution(Strategy):
 		return self.unflatten(all_truck_paths), total_distance_traveled 
 
 	def flatten(self,all_truck_paths):
-		flattened_solution = [-1]
+		flattened_solution = []
 		for truck_locations in all_truck_paths:
-			flattened_solution+= truck_locations[1:-1]
 			flattened_solution+=[-1]
+			flattened_solution+= truck_locations[1:-1]
+			
 		return flattened_solution
 
 	def unflatten(self,flattened):

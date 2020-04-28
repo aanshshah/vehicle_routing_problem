@@ -6,6 +6,7 @@ from evolutionary import Evolution_Solution
 import os
 from combine_approaches import Combined_Evo_TwoOpt
 from twoopt import TwoOpt_Solution
+from combined_hill_2opt import Combined_Hill2OPT_TwoOpt
 
 
 
@@ -93,7 +94,7 @@ def get_strategy(strategy, instance, seed=0):
 	elif strategy == 'evo':
 		return Evolution_Solution(instance)
 	else:
-		return Combined_Evo_TwoOpt(instance)
+		return Combined_Hill2OPT_TwoOpt(instance) #Combined_Evo_TwoOpt(instance)
 
 		
 
