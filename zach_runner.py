@@ -1,7 +1,7 @@
 import argparse
 from random_solution import RandomStrategy
 from greedy_hill_climbing import GreedyHillClimbing
-from zach_test import Iterative_Solution
+from stochastic_hill_climb import Iterative_Solution
 from evolutionary import Evolution_Solution
 import os
 from combine_approaches import Combined_Evo_TwoOpt
@@ -93,13 +93,10 @@ def get_strategy(strategy, instance, seed=0):
 		return TwoOpt_Solution(instance)
 	elif strategy == 'evo':
 		return Evolution_Solution(instance)
+	elif strategy == 'evo_2opt':
+		return Combined_Evo_TwoOpt(instance)
 	else:
 		return Combined_Hill2OPT_TwoOpt(instance) #Combined_Evo_TwoOpt(instance)
-
-		
-
-
-
 
 def main(filename, single, strategy, test):
 	if test and strategy:

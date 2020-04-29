@@ -9,7 +9,7 @@ class Combined_Evo_TwoOpt(Strategy):
 		super().__init__(instance)
 		random.seed(seed)
 		self.greedy = greedy
-		self.name = "iterative_sol_combine"
+		self.name = "iterative_sol_evo_and_twoopt"
 		self.vehicle_map = {i : (self.vehicle_capacity, 0, [0]) for i in range(self.num_vehicles)}
 		self.epsilon = epsilon
 
@@ -56,7 +56,7 @@ class Combined_Evo_TwoOpt(Strategy):
 	def approach(self,pop_size=25,top_k=5):
 		population = [self.flatten(self.get_initial_solution(i)) for i in range(pop_size)]
 
-		for step in range(1500):
+		for step in range(10000):
 			# print(step)
 
 			population = self.evolve(population,pop_size,top_k,step)
@@ -72,12 +72,8 @@ class Combined_Evo_TwoOpt(Strategy):
 		fitness = [(s,self.calculate_total_distance(s)+1000000*(not self.check_within_capacity(s))) for s in population]
 
 		ranked_pop = sorted(fitness,key=lambda x: x[-1])[:top_k]
-		if step % 100 == 0:
-			ranked_pop = [(self.iterate_on_2optSwap(p,iterations=1,stop_if_no_progress=True)[0],s) for p,s in ranked_pop]
-
-
-
-		# print("Best",ranked_pop[0][1])
+		if step % 1000 == 0:  #Every 100 steps, apply two-opt
+			ranked_pop = [(self.iterate_on_2optSwap(p,iterations=1,stop_if_no_progress=True,stochastic=True,p=0.5)[0],s) for p,s in ranked_pop]
 
 		new_pop = []
 		for x in range(pop_size//(top_k*top_k)):
@@ -95,85 +91,33 @@ class Combined_Evo_TwoOpt(Strategy):
 
 		return new_pop
 
-	def mutate(self,solution,p):
-		if np.random.rand() < p:
-			swaps = self.get_all_neighbors(solution)  #Can't do multiple mutations simultaneosly?
-			random.shuffle(swaps)
-			choice = swaps[0]
-			solution= self.apply_swap(solution,choice)
-		return solution
+	def recombine(self,solution_1,solution_2,reverse_p=0.02): #Should i use numpy arrays??? (This applies to the swap approach too)
+		
+		start = np.random.randint(1,len(solution_1)-1)
+		if -1 in solution_1[start:]:
+			max_end = start + solution_1[start:].index(-1)
+		else:
+			max_end = start + len(solution_1[start:])
 
-
-	def recombine(self,solution_1,solution_2,p=0.08): #Should i use numpy arrays??? (This applies to the swap approach too)
-		# segment_length = 
+		end = np.random.randint(start+1,max_end) if start+1 < max_end else max_end
 
 	
-
-
-
-		# truck_selected = np.random.randint(0,len(solution_1))
-
-
-		# print(solution_1[truck_selected])
-
-
-		# if len(solution_1[truck_selected]) <= 2:
-		# 	return copy.deepcopy(solution_2)
-
-
-		# if len(solution_1[truck_selected]) == 3:
-		# 	start = 1
-		# 	end = 2
-		# else:
-
-		start = np.random.randint(1,len(solution_1)-1)
-		end = min(np.random.randint(start+1,len(solution_1)),start+solution_1[start:].index(-1))
-
-		# print(start,end)
-
 		segment = solution_1[start:end].copy()
 
-		if np.random.rand() < p:
+		if np.random.rand() < reverse_p:
 			segment.reverse()
 
-		# print(segment)
-
-
-		# print(segment)
-		# old_solution = solution_2
 		solution_2 = copy.deepcopy(solution_2)
 
-		# for t in range(len(solution_2)):  #Can make this faster
 		for c in segment:
 			# if c != -1:
 			# print(c)
 			solution_2.remove(c)
 
-
-
-	
 		insertion_location = np.random.randint(1,len(solution_2))
-		# print(solution_2[truck_added] )
-		# print(insertion_location)
-
-
 		solution_2= solution_2[:insertion_location]+segment + solution_2[insertion_location:]
-		# print(solution_2[truck_added])
-
-#total_truck_demand = sum([self.customer_info[c][1] for c in solution[new_truck][1:-1]])
-# 			if self.vehicle_capacity >= total_truck_demand:
-		# all_ele = []
-		# for t in solution_2:
-		# 	all_ele+=t
-
-		# print("LEN:",len(set(all_ele)))
-		# if len(set(all_ele)) < 101: exit()
-		# exit()
-		# exit()
-		# exit()
+		# print(solution_2)
 		return solution_2
-
-
 	def flatten(self,all_truck_paths):
 		flattened_solution = []
 		for truck_locations in all_truck_paths:
@@ -196,55 +140,6 @@ class Combined_Evo_TwoOpt(Strategy):
 		all_truck_paths[-1].append(0)
 
 		return all_truck_paths
-
-
-	def apply_swap(self,solution,swap):
-		starting_index = swap[0]
-		ending_index = swap[1]
-
-		ele_to_move = solution[starting_index]
-		del solution[starting_index]
-		solution.insert(ending_index,ele_to_move)
-
-		return solution
-
-	def undo_swap(self,solution,swap):
-		starting_index = swap[0]
-		ending_index = swap[1]
-		ele_to_move = solution[ending_index]
-		del solution[ending_index]
-		solution.insert(starting_index,ele_to_move)		
-		return solution
-
-	def get_all_neighbors(self,truck_paths_flat):
-		swaps = []
-
-		for i in truck_paths_flat[1:]:
-			for j in truck_paths_flat[1:]:
-				swaps.append((i,j))
-
-		return swaps
-
-	def evaluate_neighbors(self,truck_paths,sample_neighbors=False,sample_size=-1):
-		solution = truck_paths
-		swaps = self.get_all_neighbors(truck_paths)
-
-		if sample_neighbors:
-			random.shuffle(swaps)
-			swaps = swaps[:sample_size]
-
-		evaluated_swaps = []
-		for s in swaps:
-			solution = self.apply_swap(solution,s)
-			# total_truck_demand = sum([self.customer_info[c][1] for c in solution[new_truck][1:-1]])
-			# if self.vehicle_capacity >= total_truck_demand:
-			if self.check_within_capacity(solution):
-				score = self.calculate_total_distance(solution)
-			else: score = np.Inf
-			evaluated_swaps.append((s,score))
-			self.undo_swap(solution,s)
-		assert truck_paths == solution
-		return evaluated_swaps
 
 	def check_within_capacity(self,solution_flat):
 		total_d = 0
@@ -278,77 +173,34 @@ class Combined_Evo_TwoOpt(Strategy):
 
 		return total_distance_traveled
 
-	def iterate_on_2optSwap(self,truck_paths,iterations=1,stop_if_no_progress=True):
+	def iterate_on_2optSwap(self,truck_paths,iterations=1,stop_if_no_progress=True,stochastic=False,p=0.5):
 		#For every vehicle, for every customer, for every location
 
 		solution = truck_paths
 		objective_value = self.calculate_total_distance(solution)
-		# print(self.check_within_capacity(solution))
-		# exit()
-		# print("initial:",objective_value)
-		for step in range(1):
-			# print(solution)
+		for step in range(iterations):
 			previous_value = objective_value
 
 			for i in range(1,len(solution)-1):
 				for j in range(1,len(solution)-1):
+					if np.random.rand() < p:
+						continue
 					flipped = solution[i:j+1].copy()
 					flipped.reverse()
 					new_route = solution[0:i] + flipped+solution[j+1:]
 					value = self.calculate_total_distance(new_route)
-					if self.check_within_capacity(new_route): #self.check_within_capacity(new_route):
+					if self.check_within_capacity(new_route):
 						if value < objective_value:
 							solution = new_route
 							objective_value = value
-						# print("good")
-					# else:
-					# 	print("bad")
-
-			# objective_value = self.calculate_total_distance(solution)
-			# if step % 1 == 0: print("step: {}, cost: {}".format(step,objective_value))
-
+					
 			if stop_if_no_progress:
 				if previous_value == objective_value: break;
 
 		return solution,objective_value
 
 
-	# def iterate_on_2optSwap(self,truck_paths,selector,iterations=1000,stop_if_no_progress=True):
-	# 		#For every vehicle, for every customer, for every location
-
-	# 		solution = truck_paths
-	# 		objective_value = self.calculate_total_distance(solution)
-	# 		print(self.check_within_capacity(solution))
-	# 		# exit()
-	# 		print("initial:",objective_value)
-	# 		for step in range(iterations):
-	# 			# print(solution)
-	# 			previous_value = objective_value
-
-	# 			for i in range(1,len(solution)-1):
-	# 				for j in range(1,len(solution)-1):
-	# 					flipped = solution[i:j+1].copy()
-	# 					flipped.reverse()
-	# 					new_route = solution[0:i] + flipped+solution[j+1:]
-	# 					value = self.calculate_total_distance(new_route)
-	# 					if self.check_within_capacity(new_route): #self.check_within_capacity(new_route):
-	# 						if value < objective_value:
-	# 							solution = new_route
-	# 							objective_value = value
-	# 						# print("good")
-	# 					# else:
-	# 					# 	print("bad")
-
-	# 			# objective_value = self.calculate_total_distance(solution)
-	# 			if step % 1 == 0: print("step: {}, cost: {}".format(step,objective_value))
-
-	# 			if stop_if_no_progress:
-	# 				if previous_value == objective_value: break;
-
-	# 		return solution,objective_value
-
-
-
+	
 
 
 

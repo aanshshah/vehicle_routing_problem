@@ -51,7 +51,6 @@ class TwoOpt_Solution(Strategy):
 				return all_truck_paths
 
 
-
 	def get_initial_solution(self):
 		def random_search():
 			ordering = self.customer_info.copy()
@@ -93,9 +92,7 @@ class TwoOpt_Solution(Strategy):
 	def approach(self):
 		all_truck_paths = self.get_initial_solution()
 		flattened_solution = self.flatten(all_truck_paths)
-		
-		
-		all_truck_paths, total_distance_traveled =  self.iterate_on_2optSwap(flattened_solution,iterations=1000,selector=greedy)
+		all_truck_paths, total_distance_traveled =  self.iterate_on_2optSwap(flattened_solution,iterations=1000)
 
 		return self.unflatten(all_truck_paths), total_distance_traveled 
 
@@ -122,12 +119,6 @@ class TwoOpt_Solution(Strategy):
 
 		return all_truck_paths
 
-
-
-
-
-
-
 	def apply_swap(self,solution,swap):
 		starting_index = swap[0]
 		ending_index = swap[1]
@@ -145,59 +136,6 @@ class TwoOpt_Solution(Strategy):
 		del solution[ending_index]
 		solution.insert(starting_index,ele_to_move)		
 		return solution
-
-	def get_all_neighbors(self,truck_paths_flat):
-		swaps = []
-
-		for i in truck_paths_flat[1:]:
-			for j in truck_paths_flat[1:]:
-				swaps.append((i,j))
-
-		return swaps
-
-	def evaluate_neighbors(self,truck_paths,sample_neighbors=False,sample_size=-1):
-		solution = truck_paths
-		swaps = self.get_all_neighbors(truck_paths)
-
-		if sample_neighbors:
-			random.shuffle(swaps)
-			swaps = swaps[:sample_size]
-
-		evaluated_swaps = []
-		for s in swaps:
-			solution = self.apply_swap(solution,s)
-			# total_truck_demand = sum([self.customer_info[c][1] for c in solution[new_truck][1:-1]])
-			# if self.vehicle_capacity >= total_truck_demand:
-			if self.check_within_capacity(solution):
-				score = self.calculate_total_distance(solution)
-			else: score = np.Inf
-			evaluated_swaps.append((s,score))
-			self.undo_swap(solution,s)
-		assert truck_paths == solution
-		return evaluated_swaps
-
-
-
-	# def iterate_on_solution(self,truck_paths,selector,iterations=1000,stop_if_no_progress=False):
-	# 		#For every vehicle, for every customer, for every location
-
-	# 		solution = truck_paths
-	# 		objective_value = self.calculate_total_distance(solution)
-	# 		print("initial:",objective_value)
-	# 		for step in range(iterations):
-	# 			# print(solution)
-	# 			previous_value = objective_value
-	# 			swaps = self.evaluate_neighbors(solution,sample_neighbors=True,sample_size=100)
-	# 			chosen = selector(swaps,previous_value,step,iterations)
-	# 			if chosen is not None:
-	# 				solution = self.apply_swap(solution,chosen)
-	# 			objective_value = self.calculate_total_distance(solution)
-	# 			if step % 100 == 0: print("step: {}, cost: {}".format(step,objective_value))
-
-	# 			if stop_if_no_progress:
-	# 				if previous_value == objective_value: break;
-
-	# 		return solution,objective_value
 
 	def check_within_capacity(self,solution_flat):
 		total_d = 0
@@ -232,7 +170,7 @@ class TwoOpt_Solution(Strategy):
 		return total_distance_traveled
 
 
-	def iterate_on_2optSwap(self,truck_paths,selector,iterations=1000,stop_if_no_progress=True):
+	def iterate_on_2optSwap(self,truck_paths,iterations=1,stop_if_no_progress=True):
 			#For every vehicle, for every customer, for every location
 
 			solution = truck_paths
@@ -254,11 +192,7 @@ class TwoOpt_Solution(Strategy):
 							if value < objective_value:
 								solution = new_route
 								objective_value = value
-							# print("good")
-						# else:
-						# 	print("bad")
-
-				# objective_value = self.calculate_total_distance(solution)
+						
 				if step % 1 == 0: print("step: {}, cost: {}".format(step,objective_value))
 
 				if stop_if_no_progress:
@@ -266,42 +200,13 @@ class TwoOpt_Solution(Strategy):
 
 			return solution,objective_value
 
-	# def check_within_capacity(self,solution):
-	# 	for truck in solution:
-	# 		total_truck_demand = sum([self.customer_info[c][1] for c in truck[1:-1]])
-	# 		if total_truck_demand > self.vehicle_capacity:
-	# 			return False
-		
-	# 	return True
-
-def greedy(swaps,previous_value=None,step=None,max_step=None):
-		greedy_best = min(swaps,key=lambda x:x[-1])
-		chosen,value = greedy_best
-		return chosen
-
-def simmulated_annealing(swaps,previous_value,step,max_step):
-	sample,value = swaps[0]
-
-	if value < previous_value:
-		return sample
-	else:
-		T = 100*np.exp(-0.001*(step+1/max_step)) #Temp function. Neeed to tune
-		if step % 1000 == 0: print(T)
-		accept_P = np.exp(-(value-previous_value)/T) #(Kirkpatrick et al.,)
-		# print(accept_P)
-		if accept_P >= np.random.rand():
-			return sample
-		else: return None
-
-
-
-
 
 # procedure 2optSwap(route, i, k) {
 #     1. take route[0] to route[i-1] and add them in order to new_route
 #     2. take route[i] to route[k] and add them in reverse order to new_route
 #     3. take route[k+1] to end and add them in order to new_route
 #     return new_route;
+
 # }
 # Here is an example of the above with arbitrary input:
 
@@ -312,19 +217,3 @@ def simmulated_annealing(swaps,previous_value,step,max_step):
 # A → B → C → (G → F → E → D)
 # A → B → C → G → F → E → D → (H → A)
 # This is the complete 2-opt swap making use of the above mechanism:
-
-# repeat until no improvement is made {
-#     start_again:
-#     best_distance = calculateTotalDistance(existing_route)
-#     for (i = 1; i <= number of nodes eligible to be swapped - 1; i++) {
-#         for (k = i + 1; k <= number of nodes eligible to be swapped; k++) {
-#             new_route = 2optSwap(existing_route, i, k)
-#             new_distance = calculateTotalDistance(new_route)
-#             if (new_distance < best_distance) {
-#                 existing_route = new_route
-#                 best_distance = new_distance
-#                 goto start_again
-#             }
-#         }
-#     }
-# }

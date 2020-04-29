@@ -2,22 +2,20 @@ import random
 from utils import calculate_distance
 from strategy import Strategy
 import numpy as np
-import copy
 
-class Combined_Hill2OPT_TwoOpt(Strategy):
+class Iterative_Solution(Strategy):
 	def __init__(self, instance, greedy=False, seed=0, epsilon=1):
 		super().__init__(instance)
 		random.seed(seed)
-		# self.greedy = greedy
-		self.name = "iterative_sol_combine_hill_2opt"
+		# self.greedy =False # greedy
+		self.name = "iterative_sol_hill"
 		self.vehicle_map = {i : (self.vehicle_capacity, 0, [0]) for i in range(self.num_vehicles)}
 		self.epsilon = epsilon
 
-	def get_initial_solution(self):
-		# random.seed(seed)
+	def get_initial_solution(self,seed):
 		def random_search():
-
 			ordering = self.customer_info.copy()
+			random.seed(seed)
 			# if self.greedy:
 			# 	self.customer_info.sort(key=lambda x: x[1])
 			# else:
@@ -55,102 +53,19 @@ class Combined_Hill2OPT_TwoOpt(Strategy):
 
 
 
-	def flatten(self,all_truck_paths):
-		flattened_solution = []
-		for truck_locations in all_truck_paths:
-			flattened_solution+=[-1]
-			flattened_solution+= truck_locations[1:-1]
-			
-		return flattened_solution
+	def approach(self,iterations=2):
+		best = 1e26
+		assignment = None
+		for i in range(iterations):
+			cand_assignment, cand_value = self.approach_run(restart=i)
+			if cand_value < best:
+				best = cand_value
+				assignment = cand_assignment
+		return assignment,best
 
-	def unflatten(self,flattened):
-		all_truck_paths = []
-
-		for l in flattened:
-			if l == -1:
-				if len(all_truck_paths) != 0:
-					all_truck_paths[-1].append(0)
-				all_truck_paths.append([0])
-			else:
-				all_truck_paths[-1].append(l)
-
-		all_truck_paths[-1].append(0)
-
-		return all_truck_paths
-
-	
-
-	def iterate_on_2optSwap(self,truck_paths,iterations=100,stop_if_no_progress=True):
-		#For every vehicle, for every customer, for every location
-
-		# print(truck_paths.count(-1))
-
-		def check_within_capacity(solution_flat):
-			total_d = 0
-			for l in solution_flat:
-				if l == -1: total_d = 0
-				else:
-					total_d+=self.customer_info[l][1]
-
-				# print(total_d)
-
-				if total_d > self.vehicle_capacity:
-					return False
-
-			return True
-
-		def calculate_total_distance(solution_flat):
-			total_distance_traveled = 0
-
-			_,_,start_x,start_y = self.customer_info[0]
-
-			for l in solution_flat:
-				if l == -1:
-					_,_,end_x,end_y = self.customer_info[0]
-				else:
-					_,_,end_x,end_y = self.customer_info[l]
-
-				total_distance_traveled += calculate_distance(start_x, start_y, end_x, end_y)
-
-				start_x = end_x
-				start_y = end_y
-
-			return total_distance_traveled
-
-		solution = truck_paths
-		objective_value = calculate_total_distance(solution)
-		# print(self.check_within_capacity(solution))
-		# exit()
-		# print("initial:",objective_value)
-		for step in range(iterations):
-			# print(solution)
-			previous_value = objective_value
-
-			for i in range(1,len(solution)-1):
-				for j in range(1,len(solution)-1):
-					flipped = solution[i:j+1].copy()
-					flipped.reverse()
-					new_route = solution[0:i] + flipped+solution[j+1:]
-					value = calculate_total_distance(new_route)
-					if check_within_capacity(new_route): #self.check_within_capacity(new_route):
-						if value < objective_value:
-							solution = new_route
-							objective_value = value
-						# print("good")
-					# else:
-					# 	print("bad")
-
-			# objective_value = self.calculate_total_distance(solution)
-			# if step % 1 == 0: print("step: {}, cost: {}".format(step,objective_value))
-
-			if stop_if_no_progress:
-				if previous_value == objective_value: break;
-
-		return solution,objective_value\
-
-	def approach(self):
-		all_truck_paths = self.get_initial_solution()
-		all_truck_paths, total_distance_traveled =  self.iterate_on_solution(all_truck_paths,iterations=1000,selector=greedy)
+	def approach_run(self,restart=0):
+		all_truck_paths = self.get_initial_solution(restart)
+		all_truck_paths, total_distance_traveled =  self.iterate_on_solution(all_truck_paths,iterations=3000,selector=greedy)
 		# all_truck_paths, total_distance_traveled = self.iterate_on_solution(all_truck_paths,iterations=10000,selector=simmulated_annealing)
 
 		return all_truck_paths, total_distance_traveled 
@@ -229,7 +144,7 @@ class Combined_Hill2OPT_TwoOpt(Strategy):
 		
 		return True
 
-	def iterate_on_solution(self,truck_paths,selector,iterations=1000,stop_if_no_progress=False):
+	def iterate_on_solution(self,truck_paths,selector,iterations=3000,stop_if_no_progress=False):
 			#For every vehicle, for every customer, for every location
 
 			solution = truck_paths
@@ -244,19 +159,12 @@ class Combined_Hill2OPT_TwoOpt(Strategy):
 				if chosen is not None:
 					solution,_ = self.apply_swap(solution,chosen)
 				objective_value = self.calculate_total_distance(solution)
-
-				if step % 100 == 0:
-					solution,objective_value = self.iterate_on_2optSwap(self.flatten(solution),iterations=5,stop_if_no_progress=True)
-					solution = self.unflatten(solution)
-
-
 				if step % 100 == 0: print("step: {}, cost: {}".format(step,objective_value))
 
 				if stop_if_no_progress:
 					if previous_value == objective_value: break;
 
 			return solution,objective_value
-
 
 def greedy(swaps,previous_value=None,step=None,max_step=None):
 		greedy_best = min(swaps,key=lambda x:x[-1])
@@ -276,5 +184,8 @@ def simmulated_annealing(swaps,previous_value,step,max_step):
 		if accept_P >= np.random.rand():
 			return sample
 		else: return None
+
+
+
 
 
