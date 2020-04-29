@@ -177,26 +177,29 @@ class TwoOpt_Solution(Strategy):
 			objective_value = self.calculate_total_distance(solution)
 			print(self.check_within_capacity(solution))
 			# exit()
+
+			store_values = []
+
+
+
 			print("initial:",objective_value)
-			for step in range(iterations):
+			# for step in range(iterations):
 				# print(solution)
 				previous_value = objective_value
 
 				for i in range(1,len(solution)-1):
-					for j in range(i+1,len(solution)-1):
+					for j in range(1,len(solution)-1):
 						flipped = solution[i:j+1].copy()
 						flipped.reverse()
 						new_route = solution[0:i] + flipped+solution[j+1:]
 						value = self.calculate_total_distance(new_route)
 						if self.check_within_capacity(new_route): #self.check_within_capacity(new_route):
-							if value < objective_value:
-								solution = new_route
-								objective_value = value
+							store_values.append(new_route,value)
 						
-				if step % 1 == 0: print("step: {}, cost: {}".format(step,objective_value))
+				# if step % 1 == 0: print("step: {}, cost: {}".format(step,objective_value))
 
-				if stop_if_no_progress:
-					if previous_value == objective_value: break;
+				# if stop_if_no_progress:
+				# 	if previous_value == objective_value: break;
 
 			return solution,objective_value
 
