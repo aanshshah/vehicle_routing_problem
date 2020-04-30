@@ -3,6 +3,7 @@ from utils import calculate_distance
 from strategy import Strategy
 import numpy as np
 import copy
+import time
 
 class Combined_Hill2OPT_TwoOpt(Strategy):
 	def __init__(self, instance, greedy=False, seed=0, epsilon=1):
@@ -12,6 +13,7 @@ class Combined_Hill2OPT_TwoOpt(Strategy):
 		self.name = "iterative_sol_combine_hill_2opt"
 		self.vehicle_map = {i : (self.vehicle_capacity, 0, [0]) for i in range(self.num_vehicles)}
 		self.epsilon = epsilon
+		self.start_time = time.time()
 
 	def get_initial_solution(self):
 		# random.seed(seed)
@@ -136,6 +138,8 @@ class Combined_Hill2OPT_TwoOpt(Strategy):
 						if value < objective_value:
 							solution = new_route
 							objective_value = value
+				if self.check_time(): 
+					return [solution, objective_value]
 						# print("good")
 					# else:
 					# 	print("bad")
@@ -229,6 +233,10 @@ class Combined_Hill2OPT_TwoOpt(Strategy):
 		
 		return True
 
+	def check_time(self):
+		if time.time() - self.start_time > 290: return True
+		else: return False
+
 	def iterate_on_solution(self,truck_paths,selector,iterations=1000,stop_if_no_progress=False):
 			#For every vehicle, for every customer, for every location
 
@@ -236,7 +244,7 @@ class Combined_Hill2OPT_TwoOpt(Strategy):
 			objective_value = self.calculate_total_distance(solution)
 			# print(self.check_within_capacity(solution))
 			# exit()
-			print("initial:",objective_value)
+			# print("initial:",objective_value)
 			for step in range(iterations):
 				previous_value = objective_value
 				swaps = self.evaluate_neighbors(solution,sample_neighbors=True,sample_size=100)
@@ -248,9 +256,9 @@ class Combined_Hill2OPT_TwoOpt(Strategy):
 				if step % 100 == 0:
 					solution,objective_value = self.iterate_on_2optSwap(self.flatten(solution),iterations=5,stop_if_no_progress=True)
 					solution = self.unflatten(solution)
-
-
-				if step % 100 == 0: print("step: {}, cost: {}".format(step,objective_value))
+				if self.check_time(): 
+					return [solution, objective_value]
+				# if step % 100 == 0: print("step: {}, cost: {}".format(step,objective_value))
 
 				if stop_if_no_progress:
 					if previous_value == objective_value: break;
@@ -270,7 +278,7 @@ def simmulated_annealing(swaps,previous_value,step,max_step):
 		return sample
 	else:
 		T = 100*np.exp(-0.001*(step+1/max_step)) #Temp function. Neeed to tune
-		if step % 1000 == 0: print(T)
+		# if step % 1000 == 0: print(T)
 		accept_P = np.exp(-(value-previous_value)/T) #(Kirkpatrick et al.,)
 		# print(accept_P)
 		if accept_P >= np.random.rand():

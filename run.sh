@@ -11,5 +11,5 @@ then
 fi
 	
 input=$1
-
-python zach_runner.py -a evo_2opt
+# echo $input
+python zach_runner.py $1 -s

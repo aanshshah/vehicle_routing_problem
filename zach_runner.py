@@ -34,6 +34,7 @@ def format_path(paths, save_solution=False):
 	if save_solution:
 		for path in paths:
 			formatted_path += ' '.join(str(x) for x in path)
+			formatted_path += ' '
 	else:
 		for idx, path in enumerate(paths):
 			formatted_path += 'truck {0}: '.format(str(idx + 1))
@@ -61,7 +62,10 @@ def run_single(file, strategy, print_out=True):
 	elapsed = end_time - start_time
 	if paths and distance and print_out:
 		# print('Strategy: '+strategy.name)
-		output_string += "Instance: " + str(file.split('/')[1])
+		if file[-1] == '/':
+			output_string += "Instance: " + str(file.split('/')[1])
+		else:
+			output_string += "Instance: " + str(file)
 		output_string += " Time: " + str(round(elapsed, 2))
 		output_string += " Result: " + str(round(distance, 2))
 		output_string += " Solution: "+format_path(paths, save_solution=True)
@@ -122,7 +126,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('filename', nargs='?')
 	parser.add_argument('-s', '--single', action='store_true')
-	parser.add_argument('-a', '--strategy', default='random') #, choices=['random', 'random_greedy', 'greedy_hill'])
+	parser.add_argument('-a', '--strategy', default='hehe') #, choices=['random', 'random_greedy', 'greedy_hill'])
 	parser.add_argument('-t', '--test', action='store_true')
 	args = parser.parse_args()
 	main(**vars(args))
