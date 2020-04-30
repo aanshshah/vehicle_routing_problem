@@ -7,6 +7,7 @@ import os
 from combine_approaches import Combined_Evo_TwoOpt
 from twoopt import TwoOpt_Solution
 from combined_hill_2opt import Combined_Hill2OPT_TwoOpt
+import time
 
 
 
@@ -29,7 +30,7 @@ def read_instance(filename):
 
 
 def format_path(paths, save_solution=False):
-	formatted_path = ''
+	formatted_path = '0 '
 	if save_solution:
 		for path in paths:
 			formatted_path += ' '.join(str(x) for x in path)
@@ -51,13 +52,21 @@ def run_all(strategy):
 		run_single(file,strategy)
 
 def run_single(file, strategy, print_out=True):
+	output_string = ''
 	instance = read_instance(file)
 	strategy = get_strategy(strategy, instance)
+	start_time = time.time()
 	paths, distance = strategy.run()
+	end_time = time.time()
+	elapsed = end_time - start_time
 	if paths and distance and print_out:
-		print('Strategy: '+strategy.name)
-		print(format_path(paths))
-		print("distance: {0}".format(str(distance)))
+		# print('Strategy: '+strategy.name)
+		output_string += "Instance: " + str(file.split('/')[1])
+		output_string += " Time: " + str(round(elapsed, 2))
+		output_string += " Result: " + str(round(distance, 2))
+		output_string += " Solution: "+format_path(paths, save_solution=True)
+		print(output_string)
+		# print("distance: {0}".format(str(distance)))
 	else:
 		print("NO SOLUTION FOUND FOR {0}".format(file))
 

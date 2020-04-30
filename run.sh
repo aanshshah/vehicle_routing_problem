@@ -12,4 +12,4 @@ fi
 	
 input=$1
 
-java -cp src solver.ls.Main $input
+python zach_runner.py -a evo_2opt
