@@ -53,10 +53,10 @@ class Combined_Evo_TwoOpt(Strategy):
 			if len(visited) == self.num_customers:
 				return all_truck_paths
 
-	def approach(self,pop_size=25,top_k=5):
+	def approach(self,pop_size=50,top_k=5):
 		population = [self.flatten(self.get_initial_solution(i)) for i in range(pop_size)]
 
-		for step in range(10000):
+		for step in range(1500):
 			# print(step)
 
 			population = self.evolve(population,pop_size,top_k,step)
@@ -73,7 +73,7 @@ class Combined_Evo_TwoOpt(Strategy):
 
 		ranked_pop = sorted(fitness,key=lambda x: x[-1])[:top_k]
 		if step % 1000 == 0:  #Every 100 steps, apply two-opt
-			ranked_pop = [(self.iterate_on_2optSwap(p,iterations=1,stop_if_no_progress=True,stochastic=True,p=0.5)[0],s) for p,s in ranked_pop]
+			ranked_pop = [(self.iterate_on_2optSwap(p,iterations=10,stop_if_no_progress=True,stochastic=False,p=0.5)[0],s) for p,s in ranked_pop]
 
 		new_pop = []
 		for x in range(pop_size//(top_k*top_k)):
@@ -91,7 +91,7 @@ class Combined_Evo_TwoOpt(Strategy):
 
 		return new_pop
 
-	def recombine(self,solution_1,solution_2,reverse_p=0.02): #Should i use numpy arrays??? (This applies to the swap approach too)
+	def recombine(self,solution_1,solution_2,reverse_p=0.1): #Should i use numpy arrays??? (This applies to the swap approach too)
 		
 		start = np.random.randint(1,len(solution_1)-1)
 		if -1 in solution_1[start:]:
@@ -182,8 +182,8 @@ class Combined_Evo_TwoOpt(Strategy):
 			previous_value = objective_value
 
 			for i in range(1,len(solution)-1):
-				for j in range(1,len(solution)-1):
-					if np.random.rand() < p:
+				for j in range(i+1,len(solution)-1):
+					if stochastic and np.random.rand() < p:
 						continue
 					flipped = solution[i:j+1].copy()
 					flipped.reverse()

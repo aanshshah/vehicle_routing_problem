@@ -127,7 +127,7 @@ class Combined_Hill2OPT_TwoOpt(Strategy):
 			previous_value = objective_value
 
 			for i in range(1,len(solution)-1):
-				for j in range(1,len(solution)-1):
+				for j in range(i+1,len(solution)-1):
 					flipped = solution[i:j+1].copy()
 					flipped.reverse()
 					new_route = solution[0:i] + flipped+solution[j+1:]
