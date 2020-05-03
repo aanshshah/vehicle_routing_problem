@@ -160,7 +160,7 @@ class Combined_Evo_TwoOpt(Strategy):
 
 		_,_,start_x,start_y = self.customer_info[0]
 
-		for l in solution_flat:
+		for l in solution_flat+[-1]:
 			if l == -1:
 				_,_,end_x,end_y = self.customer_info[0]
 			else:
