@@ -1,7 +1,7 @@
 import random 
 from utils import calculate_distance
 from strategy import Strategy
-import numpy as np
+import math
 
 class Iterative_Solution(Strategy):
 	def __init__(self, instance, greedy=False, seed=0, epsilon=1):
@@ -128,7 +128,7 @@ class Iterative_Solution(Strategy):
 			total_truck_demand = sum([self.customer_info[c][1] for c in solution[new_truck][1:-1]])
 			if self.vehicle_capacity >= total_truck_demand:
 				score = self.calculate_total_distance(solution)
-			else: score = np.Inf
+			else: score = 9999999999999
 			evaluated_swaps.append((s,score))
 			self.undo_swap(solution,s)
 		assert truck_paths == solution
@@ -177,11 +177,11 @@ def simmulated_annealing(swaps,previous_value,step,max_step):
 	if value < previous_value:
 		return sample
 	else:
-		T = 100*np.exp(-0.001*(step+1/max_step)) #Temp function. Neeed to tune
+		T = 100*math.exp(-0.001*(step+1/max_step)) #Temp function. Neeed to tune
 		if step % 1000 == 0: print(T)
-		accept_P = np.exp(-(value-previous_value)/T) #(Kirkpatrick et al.,)
+		accept_P = math.exp(-(value-previous_value)/T) #(Kirkpatrick et al.,)
 		# print(accept_P)
-		if accept_P >= np.random.rand():
+		if accept_P >= random.random():
 			return sample
 		else: return None
 
