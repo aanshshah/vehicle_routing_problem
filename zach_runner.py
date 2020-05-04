@@ -6,7 +6,7 @@ from stochastic_hill_climb import Iterative_Solution
 import os
 #from combine_approaches import Combined_Evo_TwoOpt
 #from twoopt import TwoOpt_Solution
-#from combined_hill_2opt import Combined_Hill2OPT_TwoOpt
+from combined_hill_2opt import Combined_Hill2OPT_TwoOpt
 import time
 
 
@@ -126,7 +126,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('filename', nargs='?')
 	parser.add_argument('-s', '--single', action='store_true')
-	parser.add_argument('-a', '--strategy', default='hill') #, choices=['random', 'random_greedy', 'greedy_hill'])
+	parser.add_argument('-a', '--strategy', default='hehe') #, choices=['random', 'random_greedy', 'greedy_hill'])
 	parser.add_argument('-t', '--test', action='store_true')
 	args = parser.parse_args()
 	main(**vars(args))
