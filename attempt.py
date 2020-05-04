@@ -113,6 +113,7 @@ def solve_instance(instance_filename, start_time):
 
 	while t >= t_f:
 		for i in range(c_it):
+			if time.time() - start_time > 290: return obj_best, best_route
 			r = random.random()
 			if r <= 0.5:
 				instance.twoopt()
@@ -135,8 +136,7 @@ def solve_instance(instance_filename, start_time):
 			if obj_cur < obj_best:
 				best_route = instance.routeClone(instance.routes)
 				obj_best = obj_cur
-		if time.time() - start_time > 290:
-			return obj_best, best_route
+
 		t = a * t
 		c_it = int(beta*c_it)
 

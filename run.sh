@@ -12,4 +12,4 @@ fi
 	
 input=$1
 # echo $input
-python zach_runner.py $1
+python attempt.py $1
