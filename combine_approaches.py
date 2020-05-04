@@ -3,6 +3,7 @@ from utils import calculate_distance
 from strategy import Strategy
 import numpy as np
 import copy
+import time
 
 class Combined_Evo_TwoOpt(Strategy):
 	def __init__(self, instance, greedy=False, seed=0, epsilon=1):
@@ -12,6 +13,11 @@ class Combined_Evo_TwoOpt(Strategy):
 		self.name = "iterative_sol_evo_and_twoopt"
 		self.vehicle_map = {i : (self.vehicle_capacity, 0, [0]) for i in range(self.num_vehicles)}
 		self.epsilon = epsilon
+		self.start_time = time.time()
+	
+	def check_time(self):
+		if time.time() - self.start_time > 290: return True
+		else: return False	
 
 	def get_initial_solution(self,seed):
 		random.seed(seed)
@@ -193,7 +199,8 @@ class Combined_Evo_TwoOpt(Strategy):
 						if value < objective_value:
 							solution = new_route
 							objective_value = value
-					
+				if self.check_time(): 
+					return [solution, objective_value]	
 			if stop_if_no_progress:
 				if previous_value == objective_value: break;
 

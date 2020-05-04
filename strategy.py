@@ -4,7 +4,8 @@ class Strategy:
 		self.parse_instance()
 		self.attempts = 0
 		self.name = 'Strategy Name'
-
+		self.vehicle_map = {i : (self.vehicle_capacity, 0, [0]) for i in range(self.num_vehicles)}
+		
 	def parse_instance(self):
 		self.depo_coords, self.specs, self.customer_info = self.instance
 		self.num_customers = self.specs[0]
