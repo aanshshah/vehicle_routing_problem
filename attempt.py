@@ -160,13 +160,16 @@ def format_solution(filename, distance, time, routes):
 	output += "Solution: {0}".format(formatted_paths)
 	return output
 
+def main(filename, start_time=time.time()):
+	distance, best_route = solve_instance(filename, start_time)
+	elapsed_time = time.time() - start_time
+	output = format_solution(filename, distance, elapsed_time, best_route)
+	print(output)
+
 if __name__ == '__main__':
 	random.seed(0)
 	parser = argparse.ArgumentParser()
 	parser.add_argument('filename')
 	args = parser.parse_args()
 	start_time = time.time()
-	distance, best_route = solve_instance(args.filename, start_time)
-	elapsed_time = time.time() - start_time
-	output = format_solution(args.filename, distance, elapsed_time, best_route)
-	print(output)
+	main(args.filename, start_time)
