@@ -71,7 +71,7 @@ class Combined_Evo_TwoOpt(Strategy):
 			# if step % 100 == 0:
 				# population = [self.iterate_on_2optSwap(p,iterations=10,stop_if_no_progress=True)[0] for p in population]
 
-			if step % 10 == 0: print("Step: {}, {}".format(step,self.calculate_total_distance(population[0])))
+			#if step % 10 == 0: print("Step: {}, {}".format(step,self.calculate_total_distance(population[0])))
 
 		# print(population[0])
 		return self.unflatten(population[0]), self.calculate_total_distance(population[0]) 
@@ -190,7 +190,7 @@ class Combined_Evo_TwoOpt(Strategy):
 		a = 0.95
 		#t_0 = 10 #1000
 		t_f = 0.1
-		print(t_0)
+		#print(t_0)
 		t = t_0
 		beta = 1.0
 		cur_iterations = 0
