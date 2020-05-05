@@ -1,13 +1,13 @@
 import argparse
 from random_solution import RandomStrategy
-from greedy_hill_climbing import GreedyHillClimbing
-from stochastic_hill_climb import Iterative_Solution
-from evolutionary import Evolution_Solution
+#from greedy_hill_climbing import GreedyHillClimbing
+#from stochastic_hill_climb import Iterative_Solution
+#from evolutionary import Evolution_Solution
 import os
 # from combine_approaches import Combined_Evo_TwoOpt
 from evo_2opt_sim_anneal import Combined_Evo_TwoOpt
-from twoopt import TwoOpt_Solution
-from combined_hill_2opt import Combined_Hill2OPT_TwoOpt
+#from twoopt import TwoOpt_Solution
+#from combined_hill_2opt import Combined_Hill2OPT_TwoOpt
 
 
 

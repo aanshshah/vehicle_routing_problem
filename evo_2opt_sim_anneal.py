@@ -101,18 +101,18 @@ class Combined_Evo_TwoOpt(Strategy):
 
 	def recombine(self,solution_1,solution_2,reverse_p=0.1): #Should i use numpy arrays??? (This applies to the swap approach too)
 		
-		start = np.random.randint(1,len(solution_1)-1)
+		start = random.randint(1,len(solution_1)-1)
 		if -1 in solution_1[start:]:
 			max_end = start + solution_1[start:].index(-1)
 		else:
 			max_end = start + len(solution_1[start:])
 
-		end = np.random.randint(start+1,max_end) if start+1 < max_end else max_end
+		end = random.randint(start+1,max_end) if start+1 < max_end else max_end
 
 	
 		segment = solution_1[start:end].copy()
 
-		if np.random.rand() < reverse_p:
+		if random.random() < reverse_p:
 			segment.reverse()
 
 		solution_2 = copy.deepcopy(solution_2)
@@ -122,7 +122,7 @@ class Combined_Evo_TwoOpt(Strategy):
 			# print(c)
 			solution_2.remove(c)
 
-		insertion_location = np.random.randint(1,len(solution_2))
+		insertion_location = random.randint(1,len(solution_2))
 		solution_2= solution_2[:insertion_location]+segment + solution_2[insertion_location:]
 		# print(solution_2)
 		return solution_2
