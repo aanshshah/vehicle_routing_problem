@@ -2,6 +2,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cluster import KMeans, DBSCAN
+from sklearn.model_selection import LeaveOneOut, cross_val_score 
 import numpy as np
 
 class StrategyInfo:
@@ -92,7 +93,17 @@ def accuracy(y_test, y_true, instance_names):
 			incorrect_names.append(instance_names[i])
 	return (correct * 1.0)/n, incorrect_names
 
-def linear_regression(X, labels, instance_names): #93.5%
+def linear_regression(X, labels, instance_names, cross_val=False): #93.5%
+	# reg = LinearRegression()
+	# loocv = LeaveOneOut()
+	if cross_val:
+		for i in range(2, 9):
+			print("CV:", i)
+			reg = LinearRegression()
+			results_loocv = cross_val_score(reg, X, labels, cv=i)
+			print(results_loocv)
+			print("mean R^2:", results_loocv.mean())
+	
 	reg = LinearRegression().fit(X, labels)
 	score = reg.score(X, labels)
 	pred_label = reg.predict(X)
@@ -122,6 +133,123 @@ def pretty_print(best_performance):
 	for instance_name, strat_info in best_performance.items():
 		print(instance_name, strat_info[0])
 
+def validate_solution(logname):
+
+	def get_route(routes):
+		start = None
+		end = None
+		paths = []
+		path = []
+		for idx, customer in enumerate(routes):
+			if customer == 0 and not start and not end:
+				start = True
+				path.append(customer)
+			elif customer == 0 and not end and start:
+				end = True
+				path.append(customer)
+			elif start and not end:
+				path.append(customer)
+			if start and end:
+				start = None
+				end = None
+				paths.append(path)
+				path = []
+		return paths
+
+	def check_num_vehicles(routes, num_vehicles):
+		assert num_vehicles == len(routes), \
+		"number of vehicles is {0} and routes length is {1}".format(num_vehicles, len(routes))
+
+	def check_unique_passengers(routes, numCustomers):
+		customers_visited = set()
+		for route in routes:
+			for customer in route:
+				if customer == 0: 
+					customers_visited.add(customer)
+					continue
+
+				assert customer not in customers_visited, \
+				"customers are not unique: {0} visited again".format(customer)
+
+				customers_visited.add(customer)
+		# assert len(customers_visited) == numCustomers-1, "not all customers were visited"
+		if len(customers_visited) != numCustomers:
+			print(len(customers_visited), numCustomers)
+			print("not all customers were visited")
+		for i in range(numCustomers):
+			if i not in customers_visited:
+				print(i)
+	def check_vehicle_starts_and_ends_at_depo(routes):
+		for route in routes:
+			assert route[0] == 0 and route[-1] == 0, "Vehicle must start and end at depo"
+
+	def calculate_distance(x1, y1, x2, y2):
+		return (((x1-x2)*(x1-x2))+((y1-y2)*(y1-y2)))**0.5
+
+	def calculate_total_distance(x, y, routes, demand, reported_distance):
+		truck_x, truck_y = x[0], y[0]
+		total_distance = 0.0
+		for route in routes:
+			for customer in route:
+				customer_x, customer_y = x[customer], y[customer]
+				total_distance += calculate_distance(truck_x, truck_y, customer_x, customer_y)
+				truck_x, truck_y = customer_x, customer_y
+		total_distance = round(total_distance, 2)
+		if total_distance != reported_distance:
+			print("Total distance is incorrect")
+			print(total_distance, reported_distance)
+		# assert reported_distance == total_distance, "Total distance is incorrect"
+
+	def check_vehicle_capacity(routes, vehicle_capacity, demand):
+		for route in routes:
+			capacity = vehicle_capacity
+			for customer in route:
+				capacity -= demand[customer]
+			assert capacity >= 0, "Max vehicle capacity was exceeded"
+
+	def get_instance_information(instance_name):
+		with open("input/{0}".format(instance_name), 'r') as f:
+			lines = f.readlines()
+		numCustomers, numVehicles, vehicleCapacity = [int(x) for x in lines[0].split()]
+		demand = [] #the demand of each customer
+		x = [] #the x coordinate of each customer
+		y = [] #the y coordinate of each customer
+		for idx, line in enumerate(lines[1:]):
+			line = line.split()
+			if line:
+				demand.append(float(line[0]))
+				x.append(float(line[1]))
+				y.append(float(line[2]))
+		return numCustomers, numVehicles, vehicleCapacity, demand, x, y
+
+
+	instances = {}
+	with open(logname, 'r') as f:
+		lines = f.readlines()
+	for line in lines:
+		line = line.split()
+		instance_name = line[1].split('/')
+		if len(instance_name) > 1:
+			instance_name = instance_name[-1]
+		else:
+			instance_name = instance_name[0]
+		distance = line[5]
+		path = [int(x) for x in line[8:]]
+		instances[instance_name] = (distance, path)
+
+	for instance_name, properties in instances.items():
+		# if instance_name == '135_7_1.vrp':
+		print(instance_name)
+		distance = float(properties[0])
+		routes = properties[1]
+		numCustomers, numVehicles, vehicleCapacity, demand, x, y = get_instance_information(instance_name)
+		routes = get_route(routes)
+		check_num_vehicles(routes, numVehicles)
+		check_unique_passengers(routes, numCustomers)
+		check_vehicle_starts_and_ends_at_depo(routes)
+		check_vehicle_capacity(routes, vehicleCapacity, demand)
+		calculate_total_distance(x, y, routes, demand, distance)
+
 def main():
 	logs = ['results_attempt_pypy.log', 'results_combined_hill_2opt_pypy.log']
 	names = ['simulated_annealing_2opt', 'combined_hill_2opt']
@@ -130,11 +258,13 @@ def main():
 	best_performance = compare_performance(strategy_one, strategy_two)
 	X, labels, instance_names = generate_inputs(best_performance)
 	model, correct, incorrect_names = linear_regression(X, labels, instance_names)
+	
 	# print(model.coef_, model.intercept_)
-	pretty_print(best_performance)
+	# pretty_print(best_performance)
 
 if __name__ == '__main__':
-	main()
+	validate_solution("results_ref.log")
+	# main()
 
 
 
