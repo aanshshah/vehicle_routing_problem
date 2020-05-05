@@ -64,7 +64,7 @@ class Combined_Evo_TwoOpt(Strategy):
 	def approach(self,pop_size=25,top_k=5):
 		population = [self.flatten(self.get_initial_solution(i)) for i in range(pop_size)]
 
-		for step in range(3000):
+		for step in range(6000):
 			# print(step)
 
 			population = self.evolve(population,pop_size,top_k,step)
