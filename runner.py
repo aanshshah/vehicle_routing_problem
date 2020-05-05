@@ -6,7 +6,8 @@ from random_solution import RandomStrategy
 import os
 #from combine_approaches import Combined_Evo_TwoOpt
 #from twoopt import TwoOpt_Solution
-from combined_hill_2opt import Combined_Hill2OPT_TwoOpt
+# from combined_hill_2opt import Combined_Hill2OPT_TwoOpt
+from evo_2opt_sim_anneal import Combined_Evo_TwoOpt
 import time
 import attempt
 
@@ -112,14 +113,14 @@ def get_strategy(strategy, instance, seed=0):
         return Combined_Hill2OPT_TwoOpt(instance) #Combined_Evo_TwoOpt(instance)
 
 def main(filename):
-    with open(filename) as f:
-        coords = [int(x) for x in f.readline().split()]
-    decision_boundary = [0.00594855, -0.05837677, 0.00013399]
-    if sum([x*y for x,y in zip(coords,decision_boundary)]) < 0: #simulated_annealing_2opt
-        attempt.main(filename)
-    else: #Combined_Hill2OPT_TwoOpt
-        run_single(filename, 'hehe')
-
+    # with open(filename) as f:
+    #     coords = [int(x) for x in f.readline().split()]
+    # decision_boundary = [0.00594855, -0.05837677, 0.00013399]
+    # if sum([x*y for x,y in zip(coords,decision_boundary)]) < 0: #simulated_annealing_2opt
+    #     attempt.main(filename)
+    # else: #Combined_Hill2OPT_TwoOpt
+    #     run_single(filename, 'evo_2opt')
+    run_single(filename, 'evo_2opt')
 if __name__ == '__main__':
     # run_all("Zach")
     parser = argparse.ArgumentParser()
