@@ -1,0 +1,86 @@
+<html>
+<meta charset="utf-8">
+      <head>
+			<style>
+table {
+    font-family:"Palatino Linotype", "Book Antiqua", Palatino, serif;
+    font-size:1em;
+    border-collapse: collapse;
+
+    display: block;
+    overflow-x: scroll;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 8px;
+}
+
+th {
+    color:white;
+    background-color:steelblue;
+}
+
+td {
+    border:1px solid steelblue;
+}
+
+td.rowkey {
+    text-align:left;
+}
+
+
+tr:hover {
+    color:#000000;
+    background-color:#E0E0E0;
+}
+
+
+tr[chosen=true] {
+    background-color:#B5CDE1;
+}
+
+</style>
+        <title> CS2951-O </title>
+        <link href="bootstrap.css" rel="stylesheet">
+        <meta charset="utf-8">
+				<script type="text/javascript" src="https://d3js.org/d3.v3.min.js""></script>
+
+        <script type="text/javascript" src="p4loadAggregate.js"></script>
+				<script type="text/javascript" src="createTable.js"></script>
+        <script type="text/javascript" src="drawLinePlot.js"></script>
+        <script type="text/javascript" src="toggleStat.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="line_plot.css" />
+
+    </head>
+
+    <body>
+		    <div class="container">
+        <div class="navbar">
+        <div class="navbar-inner">
+        <a class="brand" href="#">CS2951-O</a>
+        <ul class="nav">
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="lectures.html">Lectures</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <!-- <li><a href="calendar.html">Calendar</a></li> -->
+        <li><a href="staff.html">Staff</a></li>
+        <li><a href="p4leaderboard.html">Current Leaderboard</a></li>
+
+        </ul>
+        </div>
+        </div>
+        <h2 id='course'> Foundations of Prescriptive Analytics</h2>
+
+        <legend>Podium | Leaderboard</legend
+				<img src="sports.png" class="img-responsive" alt="Olympic Sports">
+        <p>You can select row(s) to compare different strategies. The plot uses a negative value to distinguish unsolved instances.</p>
+        <p>If your results aren't showing up properly in the leaderboard, double check your results.log file to make sure it meets the right specifications!</p>
+        <div id="table"></div>
+        <div id="plot"></div>
+    </body>
+
+
+</html>
