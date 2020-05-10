@@ -263,7 +263,7 @@ def main():
 	# pretty_print(best_performance)
 
 if __name__ == '__main__':
-	validate_solution("results_ref.log")
+	validate_solution("results_evo_2opt_sa.log")
 	# main()
 
 

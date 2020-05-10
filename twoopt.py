@@ -1,7 +1,7 @@
 import random 
 from utils import calculate_distance
 from strategy import Strategy
-import numpy as np
+# import numpy as np
 import copy
 
 class TwoOpt_Solution(Strategy):
@@ -175,9 +175,8 @@ class TwoOpt_Solution(Strategy):
 
 			solution = truck_paths
 			objective_value = self.calculate_total_distance(solution)
-			print(self.check_within_capacity(solution))
+			# print(self.check_within_capacity(solution))
 			# exit()
-			print("initial:",objective_value)
 			for step in range(iterations):
 				# print(solution)
 				previous_value = objective_value
@@ -192,8 +191,8 @@ class TwoOpt_Solution(Strategy):
 							if value < objective_value:
 								solution = new_route
 								objective_value = value
-						
-				if step % 1 == 0: print("step: {}, cost: {}".format(step,objective_value))
+								self.paths = solution
+								self.distance = objective_value
 
 				if stop_if_no_progress:
 					if previous_value == objective_value: break;

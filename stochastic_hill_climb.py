@@ -151,7 +151,6 @@ class Iterative_Solution(Strategy):
 			objective_value = self.calculate_total_distance(solution)
 			# print(self.check_within_capacity(solution))
 			# exit()
-			print("initial:",objective_value)
 			for step in range(iterations):
 				previous_value = objective_value
 				swaps = self.evaluate_neighbors(solution,sample_neighbors=True,sample_size=100)
@@ -159,11 +158,14 @@ class Iterative_Solution(Strategy):
 				if chosen is not None:
 					solution,_ = self.apply_swap(solution,chosen)
 				objective_value = self.calculate_total_distance(solution)
-				if step % 100 == 0: print("step: {}, cost: {}".format(step,objective_value))
+				if step % 100 == 0: 
+					self.paths = solution
+					self.distance = objective_value
 
 				if stop_if_no_progress:
 					if previous_value == objective_value: break;
-
+			self.paths = solution
+			self.distance = objective_value
 			return solution,objective_value
 
 def greedy(swaps,previous_value=None,step=None,max_step=None):
