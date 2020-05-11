@@ -7,7 +7,7 @@ from combined_hill_2opt import Combined_Hill2OPT_TwoOpt
 from evo_2opt_sim_anneal import Combined_Evo_TwoOpt
 import time
 import json
-from joblib import load
+import pickle
 
 def read_instance(filename):
         with open(filename, 'r') as f:
@@ -47,7 +47,8 @@ def run_all():
 def run_single(file, print_out=True):
     output_string = ''
     instance = read_instance(file)
-    clf = load('src/decision_boundary.joblib') 
+    with open('src/decision_boundary.sav', 'rb') as fp:
+        clf = pickle.load(fp)
     with open('src/label_to_name.json', 'r') as fp:
         label_to_name = json.load(fp)
     pred = str(clf.predict([instance[1]])[0])

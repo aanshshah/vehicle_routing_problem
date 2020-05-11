@@ -15,6 +15,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import warnings
 from joblib import dump, load
 import json
+import pickle
 
 class StrategyInfo:
     def __init__(self, name, logname):
@@ -343,7 +344,8 @@ def format_output_to_generate_csv():
             output += '{0},{1},{2},{3},{4},{5}'.format(strategy_name,str(instance_to_instaceIDs[instance]), \
                                                 str(distance), instance, str(time), str(distance))
             output += '\n'
-    with open("p5_visualization_website/aggregated_results.csv", 'w') as f:
+    #with open("p5_visualization_website/aggregated_results.csv", 'w') as f:
+    with open("aggregated_results.csv", 'w') as f:
         f.write(output)
 
 def calculate_distance_by_truck():
@@ -544,6 +546,8 @@ def main():
     model, correct, incorrect_names = svm(X, labels, instance_names, strategy_names)
     print(correct)
     dump(model, 'decision_boundary.joblib')
+    with open('decision_boundary.sav', 'wb') as f:
+        pickle.dump(model, f)
     with open("label_to_name.json", 'w') as f:
         json.dump(label_to_name, f)
     # models.append(model)
