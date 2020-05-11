@@ -52,10 +52,11 @@ def get_test_files():
 def run_all():
     strategies = ['random', '2opt', 'evo', 'evo_2opt', 'evo_2opt_sa']
     for strategy in strategies:
-        log_name = 'results_{0}_final.log'
+        log_name = 'results_{0}_final.log'.format(strategy)
         output = ''
         for file in get_test_files():
-            output += run_single(file,log_name,strategy)
+            print(strategy, file)
+            output += run_single(file,strategy,log_name)
             output += '\n'
         with open('logs/{0}'.format(log_name), 'w') as f:
             f.write(output)
