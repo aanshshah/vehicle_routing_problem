@@ -12,4 +12,4 @@ fi
 	
 input=$1
 # echo $input
-python attempt.py $1
+python src/runner.py $input
