@@ -568,7 +568,7 @@ def main():
 if __name__ == '__main__':
     
     # validate_logs()
-    validate_solution("results.log")
+    validate_solution("results2.log")
     #main()
 
 
