@@ -7,7 +7,7 @@ def determine_leaderboard_performance(filepath):
         screenname = line[0]
         distance = float(line[2])
         instance_name = line[3]
-        if performance.get(instance_name, (None, float('inf')))[1] > distance:
+        if performance.get(instance_name, (None, float('inf')))[1] > distance and distance > 0:
             performance[instance_name] = (screenname, distance)
     return performance
 
@@ -17,10 +17,10 @@ def get_my_best_performance(leaderboard_performance, my_screenname):
         if screenname == my_screenname: counter += 1
     return counter
 
-def get_all_other_best_performances(leaderboard_performance)
+def get_all_other_best_performances(leaderboard_performance):
     # best = {screenname : 0 for instance_name, (screenname, _) in leaderboard_performance.items()}
     best = {}
-    for instance_name, (screenname, _) in leaderboard_performance.items()::
+    for instance_name, (screenname, _) in leaderboard_performance.items():
         best[screenname] = best.get(screenname, 0) + 1
     return best
 
