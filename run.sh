@@ -12,4 +12,4 @@ fi
 	
 input=$1
 # echo $input
-python src/runner.py $input
+pypy3.6-v7.1.1 -W ignore src/runner.py $input

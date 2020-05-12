@@ -1,21 +1,21 @@
-from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.decomposition import PCA
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.cluster import KMeans, DBSCAN
-from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import LeaveOneOut, cross_val_score 
-from sklearn.preprocessing import StandardScaler
-import numpy as np
-import pandas as pd
+#from sklearn.linear_model import LinearRegression, LogisticRegression
+#from sklearn.decomposition import PCA
+#from sklearn.neighbors import KNeighborsClassifier
+#from sklearn.cluster import KMeans, DBSCAN
+#from sklearn.svm import SVC
+#from sklearn.ensemble import RandomForestClassifier
+#from sklearn.model_selection import LeaveOneOut, cross_val_score 
+#from sklearn.preprocessing import StandardScaler
+#import numpy as np
+#import pandas as pd
 import os
-import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
-from mpl_toolkits.mplot3d import Axes3D
-import warnings
-from joblib import dump, load
-import json
-import pickle
+#import matplotlib.pyplot as plt
+#from matplotlib.colors import ListedColormap
+#from mpl_toolkits.mplot3d import Axes3D
+#import warnings
+#from joblib import dump, load
+#import json
+#import pickle
 
 class StrategyInfo:
     def __init__(self, name, logname):
@@ -568,8 +568,8 @@ def main():
 if __name__ == '__main__':
     
     # validate_logs()
-    # validate_solution("results_evo_2opt_sa.log")
-    main()
+    validate_solution("results.log")
+    #main()
 
 
 

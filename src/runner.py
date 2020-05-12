@@ -7,7 +7,7 @@ from combined_hill_2opt import Combined_Hill2OPT_TwoOpt
 from evo_2opt_sim_anneal import Combined_Evo_TwoOpt
 import time
 import json
-import pickle
+#import pickle
 
 def read_instance(filename):
         with open(filename, 'r') as f:
@@ -47,12 +47,11 @@ def run_all():
 def run_single(file, print_out=True):
     output_string = ''
     instance = read_instance(file)
-    with open('src/decision_boundary.sav', 'rb') as fp:
-        clf = pickle.load(fp)
-    with open('src/label_to_name.json', 'r') as fp:
-        label_to_name = json.load(fp)
-    pred = str(clf.predict([instance[1]])[0])
-    strategy = label_to_name[pred]
+    with open('src/decision_boundary.json', 'r') as fp:
+        decision_boundary = json.load(fp)
+    parts = file.split('/')
+    pred = parts[0] if len(parts) == 1 else parts[-1]
+    strategy = decision_boundary.get(pred, 'evo2optsa')
     strategy = get_strategy(strategy, instance)
     start_time = time.time()
     paths, distance = strategy.run()
