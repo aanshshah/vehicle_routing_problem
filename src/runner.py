@@ -47,7 +47,7 @@ def run_all():
 def run_single(file, print_out=True):
     output_string = ''
     instance = read_instance(file)
-    with open('src/decision_boundary.json', 'r') as fp:
+    with open('src/decision_boundary_2.json', 'r') as fp:
         decision_boundary = json.load(fp)
     parts = file.split('/')
     pred = parts[0] if len(parts) == 1 else parts[-1]
