@@ -70,14 +70,15 @@ def run_single(file, print_out=True):
         print("NO SOLUTION FOUND FOR {0}".format(file))
 
 def get_strategy(strategy, instance, seed=0):
-    if strategy == '2opt':
-        return TwoOpt_Solution(instance)
-    elif strategy == 'evo':
-        return Evolution_Solution(instance)
-    elif strategy == 'evo2opt':
-        return Combined_Evo_TwoOpt(instance)
-    else:
-        return Combined_Hill2OPT_TwoOpt(instance) #Combined_Evo_TwoOpt(instance)
+    return Combined_Evo_TwoOpt(instance)
+#    if strategy == '2opt':
+#        return TwoOpt_Solution(instance)
+#    elif strategy == 'evo':
+#        return Evolution_Solution(instance)
+#    elif strategy == 'evo2opt':
+#        return Combined_Evo_TwoOpt(instance)
+#    else:
+#        return Combined_Hill2OPT_TwoOpt(instance) #Combined_Evo_TwoOpt(instance)
 
 def main(filename):
     run_single(filename)

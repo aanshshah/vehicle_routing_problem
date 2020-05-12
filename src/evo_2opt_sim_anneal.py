@@ -61,10 +61,10 @@ class Combined_Evo_TwoOpt(Strategy):
 			if len(visited) == self.num_customers:
 				return all_truck_paths
 
-	def approach(self,pop_size=25,top_k=5):
+	def approach(self,pop_size=100,top_k=10):
 		population = [self.flatten(self.get_initial_solution(i)) for i in range(pop_size)]
 
-		for step in range(3000):
+		for step in range(10000):
 			# print(step)
 
 			population = self.evolve(population,pop_size,top_k,step)
@@ -84,7 +84,7 @@ class Combined_Evo_TwoOpt(Strategy):
 		fitness = [(s,self.calculate_total_distance(s)+1000000*(not self.check_within_capacity(s))) for s in population]
 
 		ranked_pop = sorted(fitness,key=lambda x: x[-1])[:top_k]
-		if step % 500 == 0:  #Every 100 steps, apply two-opt
+		if step % 100 == 0:  #Every 100 steps, apply two-opt
 			ranked_pop = [(self.iterate_on_2optSwap(p,iterations=2,stop_if_no_progress=True,t_0=6000/(step+1))[0],s) for p,s in ranked_pop]
 
 		new_pop = []
