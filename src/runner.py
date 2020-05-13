@@ -5,6 +5,9 @@ import os
 from twoopt import TwoOpt_Solution
 from combined_hill_2opt import Combined_Hill2OPT_TwoOpt
 from evo_2opt_sim_anneal import Combined_Evo_TwoOpt
+from evo_2opt_sim_anneal2 import Combined_Evo_TwoOpt as Combined_Evo_TwoOpt2
+from evo_2opt_sim_anneal3 import Combined_Evo_TwoOpt as Combined_Evo_TwoOpt3
+from multiple_process import run_processes
 import time
 import json
 #import pickle
@@ -51,11 +54,21 @@ def run_single(file, print_out=True):
         decision_boundary = json.load(fp)
     parts = file.split('/')
     pred = parts[0] if len(parts) == 1 else parts[-1]
-    strategy = decision_boundary.get(pred, 'evo2optsa')
-    strategy = get_strategy(strategy, instance)
+    #strategy = decision_boundary.get(pred, 'evo2optsa')
+    #strategy = get_strategy(strategy, instance)
     start_time = time.time()
-    paths, distance = strategy.run()
+    results = run_processes([Combined_Evo_TwoOpt(instance), Combined_Evo_TwoOpt2(instance), Combined_Evo_TwoOpt3(instance)])
     end_time = time.time()
+    #print(results, time.time() - start_time)
+    best = None
+    best_dist = float("inf")
+    for paths, distance in results:
+        if distance < best_dist:
+            best_dist = distance
+            best = (paths, distance)
+    paths, distance = best
+    #paths, distance = strategy.run()
+    #end_time = time.time()
     elapsed = end_time - start_time
     if paths and distance and print_out:
         if file[-1] == '/':
@@ -70,7 +83,9 @@ def run_single(file, print_out=True):
         print("NO SOLUTION FOUND FOR {0}".format(file))
 
 def get_strategy(strategy, instance, seed=0):
-    return Combined_Evo_TwoOpt(instance)
+    if strategy == 'evo2optsa':return Combined_Evo_TwoOpt(instance)
+    else:return Combined_Hill2OPT_TwoOpt(instance)
+#    return Combined_Evo_TwoOpt(instance)
 #    if strategy == '2opt':
 #        return TwoOpt_Solution(instance)
 #    elif strategy == 'evo':
